@@ -34,7 +34,12 @@ class KMeans:
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
         #######################################################
-        self.X = np.random.rand(100, 5)
+
+        if X.dtype != np.float64:
+            self.X = X.astype(np.float64) #Si X contiene algun valor que no sea float, cambia todos los valores a tipo float.
+        
+        if X.ndim == 3:
+            self.X = X.reshape(-1,3) #Si la matriz tiene 3 dimensiones la reordena para tener forma (N, 3).
 
     def _init_options(self, options=None):
         """
