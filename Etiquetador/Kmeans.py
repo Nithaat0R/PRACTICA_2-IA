@@ -45,16 +45,18 @@ class KMeans:
     def _init_centroids(self):
 
         if self.options['km_init'] == 'first':
-            for i in self.X.flatten():
-                
+            for i in self.X.flatten():       
                 count = 0
+                
+                #Omplim centroids amb valors de X sense repetir-se
                 while count < len(self.centroids) and i != self.centroids[count]:
                     count = count + 1
                 
                 if count == len(self.centroids):
                     self.centroids.append(i)
-        
-        self.old_centroids = self.centroids
+
+            #Igualem centroids amb old_centroids
+            self.old_centroids = self.centroids
                         
         #######################################################
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
