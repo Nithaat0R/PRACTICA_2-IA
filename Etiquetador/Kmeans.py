@@ -8,20 +8,11 @@ import utils
 class KMeans:
 
     def __init__(self, X, K=1, options=None):
-        """
-         Constructor of KMeans class
-             Args:
-                 K (int): Number of cluster
-                 options (dict): dictionary with options
-            """
+
         self.num_iter = 0
         self.K = K
         self._init_X(X)
         self._init_options(options)  # DICT options
-
-    #############################################################
-    ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-    #############################################################
 
     def _init_X(self, X):
 
@@ -34,11 +25,7 @@ class KMeans:
             self.X = X.reshape(-1,3) 
 
     def _init_options(self, options=None):
-        """
-        Initialization of options in case some fields are left undefined
-        Args:
-            options (dict): dictionary with options
-        """
+
         if options is None:
             options = {}
         if 'km_init' not in options:
@@ -55,15 +42,20 @@ class KMeans:
         # If your methods need any other parameter you can add it to the options dictionary
         self.options = options
 
-        #############################################################
-        ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-        #############################################################
-
     def _init_centroids(self):
-        """
-        Initialization of centroids
-        """
 
+        if self.options['km_init'] == 'first':
+            for i in self.X.flatten():
+                
+                count = 0
+                while count < len(self.centroids) and i != self.centroids[count]:
+                    count = count + 1
+                
+                if count == len(self.centroids):
+                    self.centroids.append(i)
+        
+        self.old_centroids = self.centroids
+                        
         #######################################################
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
