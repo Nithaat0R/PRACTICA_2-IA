@@ -1,4 +1,4 @@
-__authors__ = 'TO_BE_FILLED'
+__authors__ = [1668101]
 __group__ = 'TO_BE_FILLED'
 
 import numpy as np
@@ -24,22 +24,14 @@ class KMeans:
     #############################################################
 
     def _init_X(self, X):
-        """Initialization of all pixels, sets X as an array of data in vector form (PxD)
-            Args:
-                X (list or np.array): list(matrix) of all pixel values
-                    if matrix has more than 2 dimensions, the dimensionality of the sample space is the length of
-                    the last dimension
-        """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
 
+        #Si X contiene algun valor que no sea float, cambia todos los valores a tipo float.
         if X.dtype != np.float64:
-            self.X = X.astype(np.float64) #Si X contiene algun valor que no sea float, cambia todos los valores a tipo float.
+            self.X = X.astype(np.float64) 
         
+        #Si la matriz tiene 3 dimensiones la reordena para tener forma (N, 3).
         if X.ndim == 3:
-            self.X = X.reshape(-1,3) #Si la matriz tiene 3 dimensiones la reordena para tener forma (N, 3).
+            self.X = X.reshape(-1,3) 
 
     def _init_options(self, options=None):
         """
