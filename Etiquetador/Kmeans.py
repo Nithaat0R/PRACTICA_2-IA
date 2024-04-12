@@ -1,5 +1,5 @@
 __authors__ = ['1668101','1665124']
-__group__ = 'TO_BE_FILLED'
+__group__ = '_'
 
 import numpy as np
 import utils
@@ -32,7 +32,7 @@ class KMeans:
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
-            options['tolerance'] = 0
+            options['tolerance'] = 0.1
         if 'max_iter' not in options:
             options['max_iter'] = np.inf
         if 'fitting' not in options:
@@ -94,20 +94,20 @@ class KMeans:
         self.centroids = self.centroids.reshape(-1,3)
 
     def converges(self):
-        """
-        Checks if there is a difference between current and old centroids
-        """
-        resp = True
-        for i in range(len(self.centroids)):
-            for j in range(len(self.centroids[0])):
-                if self.centroids[i][j] != self.old_centroids[i][j]:
-                    resp = False
 
-        return resp
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
+        #Itera por cada centroide
+        for i in range(len(self.centroids)):
+            #Calcula el margen de error
+            min = np.subtract(self.old_centroids[i], self.options['tolerance'])
+            max = np.add(self.old_centroids[i], self.options['tolerance'])
+            #Comprueba si el centroide actual está dentro de los margenes
+            compare1 = np.greater_equal(min, self.centroids[i])
+            compare2 = np.greater_equal(self.centroids[i], max)
+            compare = compare1*compare2
+            #Si algún centroide está fuera de los margenes, devuelve false
+            if (compare[0] and compare[1] and compare[2]) == True:
+                return False
+        return True
 
     def fit(self):
         """
