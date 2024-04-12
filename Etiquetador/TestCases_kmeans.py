@@ -43,6 +43,7 @@ class TestCases(unittest.TestCase):
             km = KMeans(input, self.test_cases['K'][ix])
             km._init_centroids()
             km.get_labels()
+            dist = distance(km.X, km.centroids)
             np.testing.assert_array_equal(km.labels, self.test_cases['labels'][ix])
 
     def test_06_get_centroids(self):

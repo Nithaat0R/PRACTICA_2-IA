@@ -3,7 +3,6 @@ __group__ = 'group'
 
 import numpy as np
 import utils
-import math
 
 class KMeans:
 
@@ -58,14 +57,15 @@ class KMeans:
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
     def get_labels(self):
-        """
-        Calculates the closest centroid of all points in X and assigns each point to the closest centroid
-        """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        self.labels = np.random.randint(self.K, size=self.X.shape[0])
+
+        #Calcula la matriz de distancias
+        distances = distance(self.X, self.centroids)
+        self.labels = np.array([])
+        self.labels = self.labels.astype(np.int64) 
+
+        #Calcula el indice del valor minimo y lo guarda en self.labels
+        for dist in distances:
+            self.labels = np.append(self.labels, np.argmin(dist))
 
     def get_centroids(self):
         """
@@ -123,12 +123,14 @@ class KMeans:
 def distance(X, C):
 
     aux = np.array([])
-
     #Itera los valores de X y C de 3 en 3 porque tenemos que calcular las distancias entre puntos 3D
-    for i1, i2, i3 in X:
-        for j1, j2, j3 in C:
+    for i in X:
+        i = i.astype(np.longdouble) 
+        for j in C:
+            j = j.astype(np.longdouble)
             #Calcula la distancia euclidiana entre los puntos y la coloca en la array
-            aux = np.append(aux, math.sqrt((i1-j1)**2 + (i2-j2)**2 + (i3-j3)**2))
+            aux = np.append(aux, np.linalg.norm(i-j))
+
     #Cuando todos los valores estan dentro de la array, la convierte en una matriz N x K
     aux = aux.reshape(X.shape[0], C.shape[0])
 
