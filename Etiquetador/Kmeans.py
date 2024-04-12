@@ -1,5 +1,5 @@
-__authors__ = 'TO_BE_FILLED'
-__group__ = 'TO_BE_FILLED'
+__authors__ = [1668101]
+__group__ = 'group'
 
 import numpy as np
 import utils
@@ -8,40 +8,24 @@ import utils
 class KMeans:
 
     def __init__(self, X, K=1, options=None):
-        """
-         Constructor of KMeans class
-             Args:
-                 K (int): Number of cluster
-                 options (dict): dictionary with options
-            """
+
         self.num_iter = 0
         self.K = K
         self._init_X(X)
         self._init_options(options)  # DICT options
 
-    #############################################################
-    ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-    #############################################################
-
     def _init_X(self, X):
-        """Initialization of all pixels, sets X as an array of data in vector form (PxD)
-            Args:
-                X (list or np.array): list(matrix) of all pixel values
-                    if matrix has more than 2 dimensions, the dimensionality of the sample space is the length of
-                    the last dimension
-        """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        self.X = np.random.rand(100, 5)
+
+        #Si X contiene algun valor que no sea float, cambia todos los valores a tipo float.
+        if X.dtype != np.float64:
+            self.X = X.astype(np.float64) 
+        
+        #Si la matriz tiene 3 dimensiones la reordena para tener forma (N, 3).
+        if X.ndim == 3:
+            self.X = X.reshape(-1,3) 
 
     def _init_options(self, options=None):
-        """
-        Initialization of options in case some fields are left undefined
-        Args:
-            options (dict): dictionary with options
-        """
+
         if options is None:
             options = {}
         if 'km_init' not in options:
@@ -58,23 +42,16 @@ class KMeans:
         # If your methods need any other parameter you can add it to the options dictionary
         self.options = options
 
-        #############################################################
-        ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-        #############################################################
-
     def _init_centroids(self):
-        """
-        Initialization of centroids
-        """
 
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        if self.options['km_init'].lower() == 'first':
-            self.centroids = np.random.rand(self.K, self.X.shape[1])
-            self.old_centroids = np.random.rand(self.K, self.X.shape[1])
-        else:
+        if self.options['km_init'] == 'first':
+
+            aux = np.unique(self.X, axis=0, return_index=True)[1]
+            aux = self.X[np.sort(aux)]
+            self.centroids = aux[:self.K]
+            self.old_centroids = self.centroids.copy()
+
+        elif self.options['km_init'] == 'random':
             self.centroids = np.random.rand(self.K, self.X.shape[1])
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
