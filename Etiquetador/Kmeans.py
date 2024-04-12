@@ -45,19 +45,12 @@ class KMeans:
     def _init_centroids(self):
 
         if self.options['km_init'] == 'first':
-            
-            i = 0
-            self.centroids = np.array([])
-            
-            while len(self.centroids) < self.K*self.X.shape[1] and i < self.X.shape[0]:
-                j = 0
-                while len(self.centroids) < self.K*self.X.shape[1] and j < self.X.shape[1]:
-                    if self.X[i][j] not in self.centroids:
-                        self.centroids = np.append(self.centroids, self.X[i][j])
-                    j = j + 1
-                i = i + 1
-            
-            self.centroids = self.centroids.reshape(self.K, self.X.shape[1])
+            #Recoge los indices de los arrays de X que no se repitan pero están ordenados en orden creciente de los arrays
+            aux = np.unique(self.X, axis=0, return_index=True)[1]
+            #Ordena los indices para obtener los arrays en el mismo orden que en X
+            aux = self.X[np.sort(aux)]
+            #Selecciona los primeros K arrays 
+            self.centroids = aux[:self.K]
             self.old_centroids = self.centroids.copy()
 
         elif self.options['km_init'] == 'random':
