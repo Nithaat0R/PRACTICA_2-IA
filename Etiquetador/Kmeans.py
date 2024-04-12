@@ -71,6 +71,24 @@ class KMeans:
         """
         Calculates coordinates of centroids based on the coordinates of all the points assigned to the centroid
         """
+        self.old_centroids = self.centroids.copy()
+        self.centroids = np.array([])
+        k = 0
+        while k < self.K:
+            i = 0
+            aux = np.array([])
+            while i < len(self.X):
+                if  self.labels[i] == k:
+                    aux = np.append(aux, self.X[i])
+                i = i + 1
+            aux = aux.reshape(-1, 3)
+            count = len(aux)
+            aux = np.sum(aux, axis=0)
+            aux = aux/count
+            self.centroids = np.append(self.centroids, aux)
+            k = k + 1
+        
+        self.centroids = self.centroids.reshape(-1,3)
         #######################################################
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
