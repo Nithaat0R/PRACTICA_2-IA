@@ -1,5 +1,5 @@
 __authors__ = [1668101]
-__group__ = 'TO_BE_FILLED'
+__group__ = 'group'
 
 import numpy as np
 import utils
@@ -45,27 +45,22 @@ class KMeans:
     def _init_centroids(self):
 
         if self.options['km_init'] == 'first':
-            for i in self.X.flatten():       
-                count = 0
-                
-                #Omplim centroids amb valors de X sense repetir-se
-                while count < len(self.centroids) and i != self.centroids[count]:
-                    count = count + 1
-                
-                if count == len(self.centroids):
-                    self.centroids.append(i)
+            
+            i = 0
+            self.centroids = np.array([])
+            
+            while len(self.centroids) < self.K*self.X.shape[1] and i < self.X.shape[0]:
+                j = 0
+                while len(self.centroids) < self.K*self.X.shape[1] and j < self.X.shape[1]:
+                    if self.X[i][j] not in self.centroids:
+                        self.centroids = np.append(self.centroids, self.X[i][j])
+                    j = j + 1
+                i = i + 1
+            
+            self.centroids = self.centroids.reshape(self.K, self.X.shape[1])
+            self.old_centroids = self.centroids.copy()
 
-            #Igualem centroids amb old_centroids
-            self.old_centroids = self.centroids
-                        
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        if self.options['km_init'].lower() == 'first':
-            self.centroids = np.random.rand(self.K, self.X.shape[1])
-            self.old_centroids = np.random.rand(self.K, self.X.shape[1])
-        else:
+        elif self.options['km_init'] == 'random':
             self.centroids = np.random.rand(self.K, self.X.shape[1])
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 

@@ -1,7 +1,7 @@
 import pickle
 import unittest
 
-from Kmeans import __authors__, __group__, KMeans, distance, get_colors
+from Kmeans import (__authors__, __group__, KMeans, distance, get_colors)
 from utils import *
 
 
