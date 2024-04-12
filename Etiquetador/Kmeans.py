@@ -1,5 +1,5 @@
-__authors__ = [1668101]
-__group__ = 'group'
+__authors__ = ['1668101','1665124']
+__group__ = 'TO_BE_FILLED'
 
 import numpy as np
 import utils
@@ -68,42 +68,46 @@ class KMeans:
             self.labels = np.append(self.labels, np.argmin(dist))
 
     def get_centroids(self):
-        """
-        Calculates coordinates of centroids based on the coordinates of all the points assigned to the centroid
-        """
+
+        #Guarda el valor de centroids en old_centroids
         self.old_centroids = self.centroids.copy()
         self.centroids = np.array([])
+        #Por cada centroide calcula el punto central de los puntos mas cercanos a un centroide
         k = 0
         while k < self.K:
             i = 0
             aux = np.array([])
             while i < len(self.X):
+                #Comprueba si el punto actual es tiene como centroide mas cercano al actual y lo guarda en una array
                 if  self.labels[i] == k:
                     aux = np.append(aux, self.X[i])
                 i = i + 1
+            #Separa la array por puntos, los suma todos y los divide entre el numero actual de puntos
             aux = aux.reshape(-1, 3)
             count = len(aux)
             aux = np.sum(aux, axis=0)
             aux = aux/count
+            #Guarda el centroide en self.centroids y calcula el siguiente centroide
             self.centroids = np.append(self.centroids, aux)
             k = k + 1
         
         self.centroids = self.centroids.reshape(-1,3)
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        pass
 
     def converges(self):
         """
         Checks if there is a difference between current and old centroids
         """
+        resp = True
+        for i in range(len(self.centroids)):
+            for j in range(len(self.centroids[0])):
+                if self.centroids[i][j] != self.old_centroids[i][j]:
+                    resp = False
+
+        return resp
         #######################################################
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
         #######################################################
-        return True
 
     def fit(self):
         """
