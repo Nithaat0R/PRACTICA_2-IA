@@ -3,7 +3,7 @@ __group__ = 'group'
 
 import numpy as np
 import utils
-
+import math
 
 class KMeans:
 
@@ -121,22 +121,18 @@ class KMeans:
 
 
 def distance(X, C):
-    """
-    Calculates the distance between each pixel and each centroid
-    Args:
-        X (numpy array): PxD 1st set of data points (usually data points)
-        C (numpy array): KxD 2nd set of data points (usually cluster centroids points)
 
-    Returns:
-        dist: PxK numpy array position ij is the distance between the
-        i-th point of the first set an the j-th point of the second set
-    """
+    aux = np.array([])
 
-    #########################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #########################################################
-    return np.random.rand(X.shape[0], C.shape[0])
+    #Itera los valores de X y C de 3 en 3 porque tenemos que calcular las distancias entre puntos 3D
+    for i1, i2, i3 in X:
+        for j1, j2, j3 in C:
+            #Calcula la distancia euclidiana entre los puntos y la coloca en la array
+            aux = np.append(aux, math.sqrt((i1-j1)**2 + (i2-j2)**2 + (i3-j3)**2))
+    #Cuando todos los valores estan dentro de la array, la convierte en una matriz N x K
+    aux = aux.reshape(X.shape[0], C.shape[0])
+
+    return aux
 
 
 def get_colors(centroids):
