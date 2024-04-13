@@ -34,9 +34,9 @@ class KMeans:
         if 'tolerance' not in options:
             options['tolerance'] = 0.5
         if 'max_iter' not in options:
-            options['max_iter'] = np.inf
+            options['max_iter'] = 35
         if 'fitting' not in options:
-            options['fitting'] = 'WCD'  # within class distance.
+            options['fitting'] = 20  # within class distance.
 
         # If your methods need any other parameter you can add it to the options dictionary
         self.options = options
@@ -115,41 +115,56 @@ class KMeans:
         self._init_centroids()
         #Calcula los centroides mientras que el converges sea False.
         #El caso 0 es una excepción porque al inicializar, centroides y old_centroides tienen el mismo valor
-        while self.converges() == False or self.num_iter == 0:
+        while (self.converges() == False or self.num_iter == 0) and self.num_iter < self.options['max_iter']:
             #Calcula los nuevos puntos mas cercanos
             self.get_labels()
             #Calcula los nuevos centroides
             self.get_centroids()
             self.num_iter = self.num_iter + 1
+        #Hay que volver a colocar esto a 0 sino no se puede volver a usar luego :c
+        self.num_iter = 0
 
     def withinClassDistance(self):
 
-        WCD = 0
+        wcd = 0
         #Calculem les distancies entre tots els punts i centroides.
         dist = distance(self.X, self.centroids)
         i = 0
         #Per cada punt suma la distancia amb el node més proper al quadrat.
         while i < self.X.shape[0]:
-            WCD = WCD + dist[i, self.labels[i]]**2
+            wcd = wcd + dist[i, self.labels[i]]**2
             i = i + 1
-        
-        WCD = WCD/i
+        #Divideix la suma de totes les distancies per trobar la mitjana
+        wcd = wcd/i
 
-        return WCD
+        return wcd
         
 
     def find_bestK(self, max_K):
-        """
-         sets the best k analysing the results up to 'max_K' clusters
-        """
-        self._init_centroids()
-        self.get_labels()
-        WCD = self.withinClassDistance()
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        pass
+        
+        cond = False
+        #Calculamos WCD para K = 2
+        self.K = 2
+        self.fit()
+        wcd = self.withinClassDistance()
+        k = 3
+        #Mientras que k sea inferior a max_k y no se cumpla la condicion, se aumenta la K optima
+        while k < max_K and cond == False:
+            old_WCD = wcd
+            #Calculamos el nuevo WCD
+            self.K = k
+            self.fit()
+            wcd = self.withinClassDistance()
+            #Calculamos el porcentaje de diferencia entre WCD y old_WCD
+            dec = 100*(wcd/old_WCD)
+
+            #Si llegamos a un decrecimiento estabilizado salimos del bucle
+            if 100 - dec < self.options['fitting']:
+                cond = True
+                self.K = self.K - 1
+            else:
+                k = k + 1
+    
 
 
 def distance(X, C):
