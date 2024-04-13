@@ -32,7 +32,7 @@ class KMeans:
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
-            options['tolerance'] = 0.1
+            options['tolerance'] = 0.5
         if 'max_iter' not in options:
             options['max_iter'] = np.inf
         if 'fitting' not in options:
@@ -101,24 +101,26 @@ class KMeans:
             min = np.subtract(self.old_centroids[i], self.options['tolerance'])
             max = np.add(self.old_centroids[i], self.options['tolerance'])
             #Comprueba si el centroide actual está dentro de los margenes
-            compare1 = np.greater_equal(min, self.centroids[i])
-            compare2 = np.greater_equal(self.centroids[i], max)
+            compare1 = np.greater_equal(self.centroids[i], min)
+            compare2 = np.greater_equal(max, self.centroids[i])
             compare = compare1*compare2
             #Si algún centroide está fuera de los margenes, devuelve false
-            if (compare[0] and compare[1] and compare[2]) == True:
+            if compare[0]*compare[1]*compare[2] == False:
                 return False
         return True
 
     def fit(self):
-        """
-        Runs K-Means algorithm until it converges or until the number of iterations is smaller
-        than the maximum number of iterations.
-        """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        pass
+        
+        #Inicializa los centroides
+        self._init_centroids()
+        #Calcula los centroides mientras que el converges sea False.
+        #El caso 0 es una excepción porque al inicializar, centroides y old_centroides tienen el mismo valor
+        while self.converges() == False or self.num_iter == 0:
+            #Calcula los nuevos puntos mas cercanos
+            self.get_labels()
+            #Calcula los nuevos centroides
+            self.get_centroids()
+            self.num_iter = self.num_iter + 1
 
     def withinClassDistance(self):
         """
