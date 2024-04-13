@@ -123,20 +123,28 @@ class KMeans:
             self.num_iter = self.num_iter + 1
 
     def withinClassDistance(self):
-        """
-         returns the within class distance of the current clustering
-        """
 
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        pass
+        WCD = 0
+        #Calculem les distancies entre tots els punts i centroides.
+        dist = distance(self.X, self.centroids)
+        i = 0
+        #Per cada punt suma la distancia amb el node més proper al quadrat.
+        while i < self.X.shape[0]:
+            WCD = WCD + dist[i, self.labels[i]]**2
+            i = i + 1
+        
+        WCD = WCD/i
+
+        return WCD
+        
 
     def find_bestK(self, max_K):
         """
          sets the best k analysing the results up to 'max_K' clusters
         """
+        self._init_centroids()
+        self.get_labels()
+        WCD = self.withinClassDistance()
         #######################################################
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
