@@ -34,7 +34,7 @@ class KMeans:
         if 'tolerance' not in options:
             options['tolerance'] = 0.5
         if 'max_iter' not in options:
-            options['max_iter'] = 35
+            options['max_iter'] = 100
         if 'fitting' not in options:
             options['fitting'] = 20  # within class distance.
 
@@ -60,12 +60,8 @@ class KMeans:
 
         #Calcula la matriz de distancias
         distances = distance(self.X, self.centroids)
-        self.labels = np.array([])
-        self.labels = self.labels.astype(np.int64) 
-
-        #Calcula el indice del valor minimo y lo guarda en self.labels
-        for dist in distances:
-            self.labels = np.append(self.labels, np.argmin(dist))
+        #Calcula el centroide mas cercano a cada punto
+        self.labels = np.argmin(distances, axis=1)
 
     def get_centroids(self):
 
@@ -73,24 +69,11 @@ class KMeans:
         self.old_centroids = self.centroids.copy()
         self.centroids = np.array([])
         #Por cada centroide calcula el punto central de los puntos mas cercanos a un centroide
-        k = 0
-        while k < self.K:
-            i = 0
-            aux = np.array([])
-            while i < len(self.X):
-                #Comprueba si el punto actual es tiene como centroide mas cercano al actual y lo guarda en una array
-                if  self.labels[i] == k:
-                    aux = np.append(aux, self.X[i])
-                i = i + 1
-            #Separa la array por puntos, los suma todos y los divide entre el numero actual de puntos
-            aux = aux.reshape(-1, 3)
-            count = len(aux)
-            aux = np.sum(aux, axis=0)
-            aux = aux/count
-            #Guarda el centroide en self.centroids y calcula el siguiente centroide
-            self.centroids = np.append(self.centroids, aux)
-            k = k + 1
-        
+        for k in range(self.K):
+            #Guarda todos los puntos mas cercanos a k
+            aux = self.X[self.labels == k]
+            #Calcula la media de los puntos para encontrar la nueva k
+            self.centroids = np.append(self.centroids, np.mean(aux, axis = 0))
         self.centroids = self.centroids.reshape(-1,3)
 
     def converges(self):
@@ -185,17 +168,9 @@ def distance(X, C):
 
 
 def get_colors(centroids):
-    """
-    for each row of the numpy matrix 'centroids' returns the color label following the 11 basic colors as a LIST
-    Args:
-        centroids (numpy array): KxD 1st set of data points (usually centroid points)
 
-    Returns:
-        labels: list of K labels corresponding to one of the 11 basic colors
-    """
-
-    #########################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #########################################################
-    return list(utils.colors)
+    #Calcula las probabilidades de cada color
+    prob = utils.get_color_prob(centroids)
+    #Ordena los indices de todas las probabilidades de menor a mayor
+    aux = np.argmax(prob,axis=1)  
+    return utils.colors[aux]
