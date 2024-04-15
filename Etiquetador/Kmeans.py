@@ -1,4 +1,4 @@
-__authors__ = ['1668101','1665124']
+__authors__ = ['1668101','1665124', '1667459']
 __group__ = '_'
 
 import numpy as np
@@ -98,12 +98,12 @@ class KMeans:
         self._init_centroids()
         #Calcula los centroides mientras que el converges sea False.
         #El caso 0 es una excepción porque al inicializar, centroides y old_centroides tienen el mismo valor
-        while (self.converges() == False or self.num_iter == 0) and self.num_iter < self.options['max_iter']:
+        while (not self.converges() or self.num_iter == 0) and self.num_iter < self.options['max_iter']:
             #Calcula los nuevos puntos mas cercanos
             self.get_labels()
             #Calcula los nuevos centroides
             self.get_centroids()
-            self.num_iter = self.num_iter + 1
+            self.num_iter += 1
         #Hay que volver a colocar esto a 0 sino no se puede volver a usar luego :c
         self.num_iter = 0
 
@@ -115,10 +115,10 @@ class KMeans:
         i = 0
         #Per cada punt suma la distancia amb el node més proper al quadrat.
         while i < self.X.shape[0]:
-            wcd = wcd + dist[i, self.labels[i]]**2
-            i = i + 1
+            wcd += dist[i, self.labels[i]]**2
+            i += 1
         #Divideix la suma de totes les distancies per trobar la mitjana
-        wcd = wcd/i
+        wcd /= i
 
         return wcd
         
@@ -132,7 +132,7 @@ class KMeans:
         wcd = self.withinClassDistance()
         k = 3
         #Mientras que k sea inferior a max_k y no se cumpla la condicion, se aumenta la K optima
-        while k < max_K and cond == False:
+        while k < max_K and not cond:
             old_WCD = wcd
             #Calculamos el nuevo WCD
             self.K = k
@@ -144,9 +144,9 @@ class KMeans:
             #Si llegamos a un decrecimiento estabilizado salimos del bucle
             if 100 - dec < self.options['fitting']:
                 cond = True
-                self.K = self.K - 1
+                self.K -= 1
             else:
-                k = k + 1
+                k += 1
     
 
 
@@ -157,7 +157,6 @@ def distance(X, C):
     for i in X:
         i = i.astype(np.longdouble) 
         for j in C:
-            j = j.astype(np.longdouble)
             #Calcula la distancia euclidiana entre los puntos y la coloca en la array
             aux = np.append(aux, np.linalg.norm(i-j))
 
