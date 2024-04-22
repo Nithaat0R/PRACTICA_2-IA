@@ -43,16 +43,22 @@ class KNN:
         self.neighbors = self.neighbors.reshape(-1, k)
 
     def get_class(self):
-        """
-        Get the class by maximum voting
-        :return: 1 array of Nx1 elements. For each of the rows in self.neighbors gets the most voted value
-                (i.e. the class at which that row belongs)
-        """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        return np.random.randint(10, size=self.neighbors.size), np.random.random(self.neighbors.size)
+
+        ret = np.array([])
+        #Por cada imagen selecciona el valor que mas se repite
+        for i in self.neighbors:
+            max = 0
+            count = 0
+            #Itera en cada valor de la imagen para ver si es el que más se repite
+            for j in i:
+                #Si el valor actual se repite mas que el guardado guarda el valor actual
+                if max < np.count_nonzero(i == j):
+                    label = i[count]
+                    max = np.count_nonzero(i == j)
+                count += 1
+            #Guarda el label que mas se repite en una array
+            ret = np.append(ret, label)
+        return ret
 
     def predict(self, test_data, k):
         """
