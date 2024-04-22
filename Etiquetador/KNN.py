@@ -23,18 +23,24 @@ class KNN:
         self.train_data = train_data.reshape(-1, 4800)
 
     def get_k_neighbours(self, test_data, k):
-        """
-        given a test_data matrix calculates de k nearest neighbours at each point (row) of test_data on self.neighbors
-        :param test_data: array that has to be shaped to a NxD matrix (N points in a D dimensional space)
-        :param k: the number of neighbors to look at
-        :return: the matrix self.neighbors is created (NxK)
-                 the ij-th entry is the j-th nearest train point to the i-th test point
-        """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        self.neighbors = np.random.randint(k, size=[test_data.shape[0], k])
+
+        #Reordena el tamaño de la matriz de datos por imagenes
+        test_data = test_data.reshape(-1,4800)
+        #Calcula las distancias entre los datos de la muestra y los datos por defecto
+        distances = cdist(test_data, self.train_data)
+        self.neighbors = np.array([])
+        #Por cada imagen ordena las distancias y guarda las k primeras etiquetas
+        for i in distances:
+            #Consigue los indices ordenados
+            aux  = np.argsort(i)
+            aux = aux.astype(np.int64)
+            j = 0
+            #Guarda las etiquetas de las k distancias mas bajas
+            while j < k:
+                self.neighbors = np.append(self.neighbors, self.labels[aux[j]])
+                j += 1
+        #Reordena el tamaño de la matriz de vecinos por imagenes
+        self.neighbors = self.neighbors.reshape(-1, k)
 
     def get_class(self):
         """
