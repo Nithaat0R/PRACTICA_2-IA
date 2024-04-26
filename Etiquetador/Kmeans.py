@@ -48,6 +48,7 @@ class KMeans:
             aux = np.unique(self.X, axis=0, return_index=True)[1]
             #Ordena los indices para obtener los arrays en el mismo orden que en X
             aux = self.X[np.sort(aux)]
+            aux = aux.astype(np.float64)
             #Selecciona los primeros K arrays 
             self.centroids = aux[:self.K]
             self.old_centroids = self.centroids.copy()
@@ -152,16 +153,9 @@ class KMeans:
 
 def distance(X, C):
 
-    aux = np.array([])
-    #Itera los valores de X y C de 3 en 3 porque tenemos que calcular las distancias entre puntos 3D
-    for i in X:
-        i = i.astype(np.longdouble) 
-        for j in C:
-            #Calcula la distancia euclidiana entre los puntos y la coloca en la array
-            aux = np.append(aux, np.linalg.norm(i-j))
-
-    #Cuando todos los valores estan dentro de la array, la convierte en una matriz N x K
-    aux = aux.reshape(X.shape[0], C.shape[0])
+    aux = np.zeros([X.shape[0], C.shape[0]])
+    for j in range(0, C.shape[0]):
+        aux[:,j] = np.linalg.norm(X - C[j,:], ord=2, axis=1)
 
     return aux
 

@@ -61,12 +61,6 @@ class KNN:
         return ret
 
     def predict(self, test_data, k):
-        """
-        predicts the class at which each element in test_data belongs to
-        :param test_data: array that has to be shaped to a NxD matrix (N points in a D dimensional space)
-        :param k: the number of neighbors to look at
-        :return: the output form get_class a Nx1 vector with the predicted shape for each test image
-        """
-
+        #Codigo original del archivo
         self.get_k_neighbours(test_data, k)
         return self.get_class()
