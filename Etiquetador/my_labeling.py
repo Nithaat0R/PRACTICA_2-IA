@@ -22,8 +22,6 @@ if __name__ == '__main__':
 
     # You can start coding your functions here
 
-
-
 def retrieval_by_color(images, labels, colors):
 
     indices = np.array([])
@@ -73,3 +71,35 @@ def retrieval_by_shape(images, labels, shape):
 
 #Llama a la función retrieval_by_shape para poder probarla
 images2 = retrieval_by_shape(imgs, class_labels, 'Dresses')
+
+def retrieval_combined(images, color_labels, shape_labels, colors, shape):
+    
+    #Ejecuta la función retrieval_by_color.
+    #Ejecuta el contenido en vez de llamar a la función porque necesitamos datos que se calculan dentro de la función para llamar a la siguiente
+
+    indices = np.array([])
+    
+    if type(colors) is list:
+        for color in colors:
+            for i in range(len(color_labels)):
+                if color in color_labels[i]:
+                    indices = np.append(indices, i)
+        indices = np.unique(indices)
+    else:
+        for i in range(len(color_labels)):
+            if colors in color_labels[i]:
+                indices = np.append(indices, i)
+
+    indices = indices.astype(int)
+    imgs = images[indices]
+
+    #Elimina los labels de forma que se correspondan con las imagenes que hemos eliminado anteriormente
+    shape_labels = shape_labels[indices]
+
+    #Llama a la función retrieval_by_shape con las imagenes nuevas y los labels actualizados
+    imgs = retrieval_by_shape(imgs, shape_labels, shape)
+
+    return imgs
+
+#Llama a la función retrieval_by_shape para poder probarla
+images3 = retrieval_combined(imgs, color_labels, class_labels, ['Blue','Black'], 'Dresses')
