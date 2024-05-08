@@ -3,6 +3,7 @@ __group__ = '324'
 
 from utils_data import read_dataset, read_extended_dataset, crop_images
 from Kmeans import *
+from KNN import *
 import numpy as np
 
 
@@ -52,4 +53,23 @@ def retrieval_by_color(images, labels, colors):
     return ret
 
 #Llama a la función retrieval_by_color para poder probarla
-images = retrieval_by_color(imgs,color_labels, ['Blue','Black'])
+images1 = retrieval_by_color(imgs,color_labels, ['Blue','Black'])
+
+def retrieval_by_shape(images, labels, shape):
+
+    indices = np.array([])
+    
+    #Por cada imagen comprueba si contiene la forma que buscamos
+    for i in range(len(labels)):
+        if shape == labels[i]:
+            #Si la imagen tiene la forma buscada añade el indice de la imagen a la lista
+            indices = np.append(indices, i)
+    #Cambia el tipo de dato de los indices a int (Se cambian a float por el append)
+    indices = indices.astype(int)
+    #Devuelve las imagenes correspondientes a los indices que hemos encontrado
+    ret = images[indices]
+
+    return ret
+
+#Llama a la función retrieval_by_shape para poder probarla
+images2 = retrieval_by_shape(imgs, class_labels, 'Dresses')
