@@ -1,11 +1,10 @@
-__authors__ = ['1668101','1665124', '1667459']
+__authors__ = ['1668101','1665124','1667459']
 __group__ = '324'
 
 from utils_data import read_dataset, read_extended_dataset, crop_images
 from Kmeans import *
 from KNN import *
 import numpy as np
-
 
 if __name__ == '__main__':
 
@@ -103,3 +102,6 @@ def retrieval_combined(images, color_labels, shape_labels, colors, shape):
 
 #Llama a la función retrieval_by_shape para poder probarla
 images3 = retrieval_combined(imgs, color_labels, class_labels, ['Blue','Black'], 'Dresses')
+
+km = KMeans(train_imgs, 4)
+km._init_centroids()

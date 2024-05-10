@@ -1,4 +1,4 @@
-__authors__ = ['1668101','1665124', '1667459']
+__authors__ = ['1668101','1665124','1667459']
 __group__ = '324'
 
 import numpy as np
@@ -28,7 +28,7 @@ class KMeans:
         if options is None:
             options = {}
         if 'km_init' not in options:
-            options['km_init'] = 'first'
+            options['km_init'] = 'equal'
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
@@ -56,6 +56,44 @@ class KMeans:
         elif self.options['km_init'] == 'random':
             self.centroids = np.random.rand(self.K, self.X.shape[1])
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
+
+        elif self.options['km_init'] == 'kmeans++':
+            #Afegeix el primer node
+            index = [0]
+            n = 1
+            
+            #Calcula la distancia entre nodes i centroide
+            dist = np.linalg.norm(self.X - self.X[0], ord=2, axis=1)
+            dist = np.mean(dist, axis=1)
+            dist = np.mean(dist, axis=1)
+   
+            #Calcula la probabiitat de ser seleccionat
+            prob = dist / np.sum(dist)
+
+            while n < self.K:
+                #Escull un node aleatori segons la probabilitat calculada
+                aux = np.random.choice(len(self.X), p=prob)
+                #Comprova si el node seleccionat es diferent als que ja existeixen
+                if aux not in index:
+                    index = np.append(index, aux)
+                    n = n + 1
+
+            self.centroids = np.array(self.X[index])
+        
+        elif self.options['km_init'] == 'equal':
+            index = []
+
+            #Recoge los indices de los arrays de X que no se repitan pero están ordenados en orden creciente de los arrays
+            aux = np.unique(self.X, axis=0, return_index=True)[1]
+            #Calcula el tamaño de un segmento de la division de de aux en K-1 partes
+            section = int((len(aux)/(self.K-1)) // 1)
+            #Calcula el valor de cada indice si dividimos aux en K partes
+            for i in range(self.K):
+                index = np.append(index, aux[i*section])
+            index = index.astype(np.int64)
+
+            self.centroids = self.X[index]
+
 
     def get_labels(self):
 
