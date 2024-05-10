@@ -28,7 +28,7 @@ class KMeans:
         if options is None:
             options = {}
         if 'km_init' not in options:
-            options['km_init'] = 'equal'
+            options['km_init'] = 'first'
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
@@ -61,12 +61,8 @@ class KMeans:
             #Afegeix el primer node
             index = [0]
             n = 1
-            
             #Calcula la distancia entre nodes i centroide
             dist = np.linalg.norm(self.X - self.X[0], ord=2, axis=1)
-            dist = np.mean(dist, axis=1)
-            dist = np.mean(dist, axis=1)
-   
             #Calcula la probabiitat de ser seleccionat
             prob = dist / np.sum(dist)
 
@@ -81,8 +77,8 @@ class KMeans:
             self.centroids = np.array(self.X[index])
         
         elif self.options['km_init'] == 'equal':
+            
             index = []
-
             #Recoge los indices de los arrays de X que no se repitan pero están ordenados en orden creciente de los arrays
             aux = np.unique(self.X, axis=0, return_index=True)[1]
             #Calcula el tamaño de un segmento de la division de de aux en K-1 partes
@@ -127,7 +123,7 @@ class KMeans:
             compare2 = np.greater_equal(max, self.centroids[i])
             compare = compare1*compare2
             #Si algún centroide está fuera de los margenes, devuelve false
-            if compare[0]*compare[1]*compare[2] == False:
+            if False in compare:
                 return False
         return True
 

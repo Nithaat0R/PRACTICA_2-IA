@@ -5,6 +5,7 @@ from utils_data import read_dataset, read_extended_dataset, crop_images
 from Kmeans import *
 from KNN import *
 import numpy as np
+import matplotlib as plt
 
 if __name__ == '__main__':
 
@@ -103,5 +104,75 @@ def retrieval_combined(images, color_labels, shape_labels, colors, shape):
 #Llama a la función retrieval_by_shape para poder probarla
 images3 = retrieval_combined(imgs, color_labels, class_labels, ['Blue','Black'], 'Dresses')
 
-km = KMeans(train_imgs, 4)
+km = KMeans(train_imgs[0], 4)
 km._init_centroids()
+
+def Kmean_statistics(kmeans, kmax):
+        
+        decList = []
+        #Calculamos WCD para K = 2
+        kmeans.K = 2
+        kmeans.fit()
+        wcd = kmeans.withinClassDistance()
+        k = 3
+        #Mientras que k sea inferior a max_k y no se cumpla la condicion, se aumenta la K optima
+        for k in range(3,kmax):
+            old_WCD = wcd
+            #Calculamos el nuevo WCD
+            kmeans.K = k
+            kmeans.fit()
+            wcd = kmeans.withinClassDistance()
+            #Calculamos el porcentaje de diferencia entre WCD y old_WCD
+            dec = 100*(wcd/old_WCD)
+            decList[k-1] = dec
+        
+        #Establim que es x i y
+        x = np.arange(2,kmax-1,1)
+        y = decList[x]
+        
+        #Creem el gràfic
+        plt.plot(x,y)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Kmean STATISTICS')
+        plt.show()
+        
+
+
+def Get_shape_accuracy(etiquetesKnn, groundtruth): #Li pasem el groundtruth o el array de labels?
+    #Inicialitzem el comptador de coincidències en 100% és a dir en totes.
+    comptador = len(etiquetesKnn)
+    #Anem un a un i en cas de que no coincideixin restem un al total
+    for i in range(len(etiquetesKnn)):
+        if etiquetesKnn[i] != groundtruth['class_labels'][i]:
+            comptador = comptador - 1
+   
+    #Retornem el calcul del percentatge
+    return comptador/len(etiquetesKnn)*100
+
+def Get_color_accuracy(etiquetesKmeans, groundtruth):
+    #Inicialitzem el comptador de coincidències en 100% és a dir en totes.
+    comptador = len(etiquetesKmeans)
+    
+    #Iterem cada llista de colors
+    for i in range(len(etiquetesKmeans)):
+        #Inicialitzem el comptador de coincidències en 0
+        coinc = 0
+        #Iterem dins de la llista de etiquetes correctes
+        for j in range(len(groundtruth['color_labels'][i])):
+            #Itereme a la vegada per la llista de etiquetes que ens ha retornat el Kmeans
+            f = 0
+            tr = False
+            #Quan troba una coincidència para de iterar, suma al 1 al comptador i es pasa a la següente posicio del llistat de correctes. Sinó
+            #Pasa a la següent posició
+            while f < len(etiquetesKmeans[i]) and tr == False:
+                if etiquetesKmeans[i][f] == len(groundtruth['color_labels'][i][j]):
+                    coinc = coinc + 1
+                    tr = True
+                else:
+                    f = f + 1
+        #Cada vegada que acabem una de les llistes de etiquetes restem al total el percentatge de aquesta equivalent dels que hem errat.
+        comptador = comptador - (len(groundtruth['color_labels'][i])-coinc/len(groundtruth['color_labels'][i]))
+   
+    #Retornem el calcul del percentatge
+    return comptador/len(etiquetesKmeans)*100
