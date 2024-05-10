@@ -1,5 +1,5 @@
 __authors__ = ['1668101','1665124', '1667459']
-__group__ = '_'
+__group__ = '324'
 
 import numpy as np
 import utils
@@ -48,6 +48,7 @@ class KMeans:
             aux = np.unique(self.X, axis=0, return_index=True)[1]
             #Ordena los indices para obtener los arrays en el mismo orden que en X
             aux = self.X[np.sort(aux)]
+            aux = aux.astype(np.float64)
             #Selecciona los primeros K arrays 
             self.centroids = aux[:self.K]
             self.old_centroids = self.centroids.copy()
@@ -55,6 +56,18 @@ class KMeans:
         elif self.options['km_init'] == 'random':
             self.centroids = np.random.rand(self.K, self.X.shape[1])
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
+
+        elif self.options['km_init'] == 'kmeans++':
+            self.centroids.append(self.X[0])
+            n = 1
+            while n < self.X:
+                dist = distance(self.X, np.array(self.centroids))
+                min_dist = np.min(dist, axis=1)
+                prob = min_dist / np.sum(min_dist)
+                new_centroid_ind = np.random.choice(len(self.X), p=prob)
+                if self.add_centroids(new_centroid_ind):
+                    n = n + 1
+
 
     def get_labels(self):
 
@@ -121,7 +134,21 @@ class KMeans:
         wcd /= i
 
         return wcd
-        
+
+    def interClassDistance(self):
+        icd = 0
+        for i in range(self.K):
+            for j in range(i+1, self.K):
+                #Calcula la distancia euclediana al quadrat del parell de nodes
+                icd += np.linalg.norm(self.centroids[i] - self.centroids[j])**2
+        #Calculem la mitjana de las distancies inter-clase
+        icd /= (self.K * (self.K - 1)) / 2
+        return icd
+
+    def fisherCoefficient(self):
+        wcd = self.withinClassDistance()
+        icd = self.interClassDistance()
+        return icd / wcd
 
     def find_bestK(self, max_K):
         
@@ -152,17 +179,9 @@ class KMeans:
 
 def distance(X, C):
 
-    aux = np.array([])
-    #Itera los valores de X y C de 3 en 3 porque tenemos que calcular las distancias entre puntos 3D
-    for i in X:
-        i = i.astype(np.longdouble) 
-        for j in C:
-            j = j.astype(np.longdouble)
-            #Calcula la distancia euclidiana entre los puntos y la coloca en la array
-            aux = np.append(aux, np.linalg.norm(i-j))
-
-    #Cuando todos los valores estan dentro de la array, la convierte en una matriz N x K
-    aux = aux.reshape(X.shape[0], C.shape[0])
+    aux = np.zeros([X.shape[0], C.shape[0]])
+    for j in range(0, C.shape[0]):
+        aux[:,j] = np.linalg.norm(X - C[j,:], ord=2, axis=1)
 
     return aux
 
