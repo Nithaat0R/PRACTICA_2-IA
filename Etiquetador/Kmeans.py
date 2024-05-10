@@ -58,13 +58,19 @@ class KMeans:
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
         elif self.options['km_init'] == 'kmeans++':
+            #Afegeix el primer node
             self.centroids.append(self.X[0])
             n = 1
             while n < self.X:
+                #Calcula la distancia entre nodes
                 dist = distance(self.X, np.array(self.centroids))
+                #Busca la distancia minima entre les distancies i la probabiitat
+                #de ser seleccionat
                 min_dist = np.min(dist, axis=1)
                 prob = min_dist / np.sum(min_dist)
+                #Escull un node aleatori
                 new_centroid_ind = np.random.choice(len(self.X), p=prob)
+                #Comprova si el node seleccionat es diferent als que ja existeixen
                 if self.add_centroids(new_centroid_ind):
                     n = n + 1
 
@@ -146,6 +152,7 @@ class KMeans:
         return icd
 
     def fisherCoefficient(self):
+        #Calcula el coeficient de fisher
         wcd = self.withinClassDistance()
         icd = self.interClassDistance()
         return icd / wcd
