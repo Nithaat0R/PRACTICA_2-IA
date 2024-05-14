@@ -5,7 +5,7 @@ from utils_data import read_dataset, read_extended_dataset, crop_images
 from Kmeans import *
 from KNN import *
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 
@@ -104,40 +104,66 @@ def retrieval_combined(images, color_labels, shape_labels, colors, shape):
 #Llama a la función retrieval_by_shape para poder probarla
 images3 = retrieval_combined(imgs, color_labels, class_labels, ['Blue','Black'], 'Dresses')
 
-km = KMeans(train_imgs[0], 4)
-km._init_centroids()
+km = KMeans(train_imgs[0], 10)
 
 def Kmean_statistics(kmeans, kmax):
         
-        decList = []
-        #Calculamos WCD para K = 2
-        kmeans.K = 2
-        kmeans.fit()
-        wcd = kmeans.withinClassDistance()
-        k = 3
-        #Mientras que k sea inferior a max_k y no se cumpla la condicion, se aumenta la K optima
-        for k in range(3,kmax):
-            old_WCD = wcd
-            #Calculamos el nuevo WCD
-            kmeans.K = k
-            kmeans.fit()
-            wcd = kmeans.withinClassDistance()
-            #Calculamos el porcentaje de diferencia entre WCD y old_WCD
-            dec = 100*(wcd/old_WCD)
-            decList[k-1] = dec
-        
-        #Establim que es x i y
-        x = np.arange(2,kmax-1,1)
-        y = decList[x]
-        
-        #Creem el gràfic
-        plt.plot(x,y)
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.title('Kmean STATISTICS')
-        plt.show()
-        
+    decList = []
+    wcdList = []
+    iterList = []
+    #Calculamos WCD para K = 2
+    kmeans.K = 2
+    kmeans.fit()
+    wcd = kmeans.withinClassDistance()
+    k = 3
+    #Mientras que k sea inferior a max_k y no se cumpla la condicion, se aumenta la K optima
+    for k in range(3,kmax):
+        old_WCD = wcd
+        #Calculamos el nuevo WCD
+        kmeans.K = k
 
+        #kmeans.fit()
+        kmeans._init_centroids()
+        while (not kmeans.converges() or kmeans.num_iter == 0) and kmeans.num_iter < kmeans.options['max_iter']:
+            kmeans.get_labels()
+            kmeans.get_centroids()
+            kmeans.num_iter += 1
+        iterList = np.append(iterList, kmeans.num_iter)
+        kmeans.num_iter = 0
+
+        wcd = kmeans.withinClassDistance()
+        #Calculamos el porcentaje de diferencia entre WCD y old_WCD
+        dec = 100*(wcd/old_WCD)
+        decList = np.append(decList, dec)
+        wcdList = np.append(wcdList, wcd)
+    
+    #Creem el gràfic
+    x = np.arange(2,kmax-1,1)
+    fig, axs = plt.subplots(3)
+        
+    
+    axs[0].plot(x, decList[x-2])
+    axs[0].set_xlabel('Number of K')
+    axs[0].set_ylabel('DEC')
+    axs[0].set_title('DEC')
+
+    
+    axs[1].plot(x, wcdList[x-2])
+    axs[1].set_xlabel('Number of K')
+    axs[1].set_ylabel('WCD')
+    axs[1].set_title('WCD')
+
+    
+    axs[2].plot(x, iterList[x-2])
+    axs[2].set_xlabel('Number of K')
+    axs[2].set_ylabel('Iterations')
+    axs[2].set_title('Iterations')
+
+    
+    fig.tight_layout()
+    plt.show()
+        
+Kmean_statistics(km, 30)
 
 def Get_shape_accuracy(etiquetesKnn, groundtruth): #Li pasem el groundtruth o el array de labels?
     #Inicialitzem el comptador de coincidències en 100% és a dir en totes.

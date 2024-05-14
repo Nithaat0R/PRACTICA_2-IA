@@ -28,7 +28,7 @@ class KMeans:
         if options is None:
             options = {}
         if 'km_init' not in options:
-            options['km_init'] = 'first'
+            options['km_init'] = 'kmeans++'
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
@@ -73,8 +73,12 @@ class KMeans:
                 if aux not in index:
                     index = np.append(index, aux)
                     n = n + 1
+                    dist_aux = np.linalg.norm(self.X - self.X[aux], ord=2, axis=1)
+                    dist = np.minimum(dist, dist_aux)
+                    prob = dist / np.sum(dist)
 
             self.centroids = np.array(self.X[index])
+            self.old_centroids = self.centroids.copy()
         
         elif self.options['km_init'] == 'equal':
             
@@ -85,10 +89,14 @@ class KMeans:
             section = int((len(aux)/(self.K-1)) // 1)
             #Calcula el valor de cada indice si dividimos aux en K partes
             for i in range(self.K):
-                index = np.append(index, aux[i*section])
+                if i*section == len(aux):
+                    index = np.append(index, aux[(i*section) - 1])
+                else:
+                    index = np.append(index, aux[i*section])
             index = index.astype(np.int64)
 
             self.centroids = self.X[index]
+            self.old_centroids = self.centroids.copy()
 
 
     def get_labels(self):
@@ -156,7 +164,21 @@ class KMeans:
         wcd /= i
 
         return wcd
+    
+    def interClassDistance(self):
+
+        dist = distance(self.centroids, self.centroids) 
         
+        icd = sum(sum(dist**2))
+        icd /= ((self.K * (self.K - 1)) * 2) 
+
+        return icd
+
+    def fisherCoefficient(self):
+        #Calcula el coeficient de fisher
+        wcd = self.withinClassDistance()
+        icd = self.interClassDistance()
+        return icd / wcd
 
     def find_bestK(self, max_K):
         
