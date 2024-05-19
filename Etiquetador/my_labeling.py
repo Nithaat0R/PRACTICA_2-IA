@@ -1,6 +1,7 @@
 __authors__ = ['1668101','1665124','1667459']
 __group__ = '324'
 
+import utils
 from utils_data import read_dataset, read_extended_dataset, crop_images
 from Kmeans import *
 from KNN import *
@@ -139,25 +140,14 @@ def Kmean_statistics(kmeans, kmax):
     
     #Creem el gràfic
     x = np.arange(2,kmax-1,1)
-    fig, axs = plt.subplots(3)
-        
+    fig, axs = plt.subplots(1)
+
+
     
-    axs[0].plot(x, decList[x-2])
+    axs[0].plot(x, iterList[x-2])
     axs[0].set_xlabel('Number of K')
-    axs[0].set_ylabel('DEC')
-    axs[0].set_title('DEC')
-
-    
-    axs[1].plot(x, wcdList[x-2])
-    axs[1].set_xlabel('Number of K')
-    axs[1].set_ylabel('WCD')
-    axs[1].set_title('WCD')
-
-    
-    axs[2].plot(x, iterList[x-2])
-    axs[2].set_xlabel('Number of K')
-    axs[2].set_ylabel('Iterations')
-    axs[2].set_title('Iterations')
+    axs[0].set_ylabel('Iterations')
+    axs[0].set_title('Iterations')
 
     
     fig.tight_layout()
@@ -165,7 +155,7 @@ def Kmean_statistics(kmeans, kmax):
         
 Kmean_statistics(km, 30)
 
-knn = KNN(train_imgs, train_class_labels)
+knn = KNN(utils.rgb2gray(train_imgs), train_class_labels)
 
 
 def Get_shape_accuracy(etiquetesKnn, groundtruth): #Li pasem el groundtruth o el array de labels?
@@ -173,38 +163,39 @@ def Get_shape_accuracy(etiquetesKnn, groundtruth): #Li pasem el groundtruth o el
     comptador = len(etiquetesKnn)
     #Anem un a un i en cas de que no coincideixin restem un al total
     for i in range(len(etiquetesKnn)):
-        if etiquetesKnn[i] != groundtruth['class_labels'][i]:
+        if etiquetesKnn[i] != groundtruth[i]:
             comptador = comptador - 1
    
     #Retornem el calcul del percentatge
     return comptador/len(etiquetesKnn)*100
 
-preds = knn.predict(test_imgs, 5)
-Get_shape_accuracy(preds, test_class_labels)
+preds = knn.predict(utils.rgb2gray(test_imgs), 2)
+shapeAcc = Get_shape_accuracy(preds, test_class_labels)
+print("Shape accuracy: ", shapeAcc)
 
 def Get_color_accuracy(etiquetesKmeans, groundtruth):
-    #Inicialitzem el comptador de coincidències en 100% és a dir en totes.
-    comptador = len(etiquetesKmeans)
-    
-    #Iterem cada llista de colors
+    Netiquetes = 0
+    count = 0
     for i in range(len(etiquetesKmeans)):
-        #Inicialitzem el comptador de coincidències en 0
-        coinc = 0
-        #Iterem dins de la llista de etiquetes correctes
-        for j in range(len(groundtruth['color_labels'][i])):
-            #Itereme a la vegada per la llista de etiquetes que ens ha retornat el Kmeans
-            f = 0
-            tr = False
-            #Quan troba una coincidència para de iterar, suma al 1 al comptador i es pasa a la següente posicio del llistat de correctes. Sinó
-            #Pasa a la següent posició
-            while f < len(etiquetesKmeans[i]) and tr == False:
-                if etiquetesKmeans[i][f] == len(groundtruth['color_labels'][i][j]):
-                    coinc = coinc + 1
-                    tr = True
-                else:
-                    f = f + 1
-        #Cada vegada que acabem una de les llistes de etiquetes restem al total el percentatge de aquesta equivalent dels que hem errat.
-        comptador = comptador - (len(groundtruth['color_labels'][i])-coinc/len(groundtruth['color_labels'][i]))
-   
-    #Retornem el calcul del percentatge
-    return comptador/len(etiquetesKmeans)*100
+        repetits = []
+        for color in etiquetesKmeans[i]:
+            if color in groundtruth[i] and color not in repetits:
+                count += 1
+                repetits = np.append(repetits, color)
+        
+        Netiquetes += len(groundtruth[i])
+    
+    return (count/Netiquetes)*100
+
+KMprova = KMeans(test_imgs[0], 4)
+KMprova.fit()
+TestColors = get_colors(KMprova.centroids)
+
+for i in range(len(test_imgs) - 1):
+    KMprova = KMeans(test_imgs[i + 1], 4)
+    KMprova.fit()
+    colors = get_colors(KMprova.centroids)
+    TestColors = np.vstack((TestColors, colors))
+
+colorAcc = Get_color_accuracy(TestColors, test_color_labels)
+print("Color accuracy: ", colorAcc)
