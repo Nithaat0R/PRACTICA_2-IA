@@ -28,7 +28,7 @@ class KMeans:
         if options is None:
             options = {}
         if 'km_init' not in options:
-            options['km_init'] = 'equal'
+            options['km_init'] = 'kmeans++'
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
@@ -180,23 +180,35 @@ class KMeans:
         icd = self.interClassDistance()
         return icd / wcd
 
-    def find_bestK(self, max_K):
-        
+    def find_bestK(self, max_K, heuristic):
+
         cond = False
         #Calculamos WCD para K = 2
         self.K = 2
         self.fit()
-        wcd = self.withinClassDistance()
+        if heuristic == 'wcd':
+            x = self.withinClassDistance()
+        elif heuristic == 'icd':
+            x = self.interClassDistance()
+        elif heuristic == 'fisher':
+            x = self.fisherCoefficient()
+
         k = 3
         #Mientras que k sea inferior a max_k y no se cumpla la condicion, se aumenta la K optima
         while k < max_K and not cond:
-            old_WCD = wcd
+            old_x = x
             #Calculamos el nuevo WCD
             self.K = k
             self.fit()
-            wcd = self.withinClassDistance()
+            if heuristic == 'wcd':
+                x = self.withinClassDistance()
+            elif heuristic == 'icd':
+                x = self.interClassDistance()
+            elif heuristic == 'fisher':
+                x = self.fisherCoefficient()
+
             #Calculamos el porcentaje de diferencia entre WCD y old_WCD
-            dec = 100*(wcd/old_WCD)
+            dec = 100*(x/old_x)
 
             #Si llegamos a un decrecimiento estabilizado salimos del bucle
             if 100 - dec < self.options['fitting']:

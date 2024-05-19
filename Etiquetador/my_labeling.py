@@ -210,3 +210,16 @@ for i in range(len(test_imgs) - 1):
 
 colorAcc = Get_color_accuracy(TestColors, test_color_labels)
 print("Color accuracy: ", colorAcc)
+
+def Get_K_accuracy(test_imgs, groundtruth, maxK, heuristic):
+    encerts = 0
+    for i in range(len(test_imgs)):
+        KMprova = KMeans(test_imgs[i], 4)
+        KMprova.find_bestK(maxK, heuristic)
+        if KMprova.K == len(groundtruth[i]):
+            encerts += 1
+    
+    return (encerts/len(test_imgs))*100
+
+kAcc = Get_K_accuracy(test_imgs, test_color_labels, 4, 'fisher')
+print("K accuracy: ", kAcc)
