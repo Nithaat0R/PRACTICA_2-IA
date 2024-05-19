@@ -140,14 +140,25 @@ def Kmean_statistics(kmeans, kmax):
     
     #Creem el gràfic
     x = np.arange(2,kmax-1,1)
-    fig, axs = plt.subplots(1)
-
+    fig, axs = plt.subplots(3)
+        
+    
+    axs[0].plot(x, decList[x-2])
+    axs[0].set_xlabel('Number of K')
+    axs[0].set_ylabel('DEC')
+    axs[0].set_title('DEC')
 
     
-    axs[0].plot(x, iterList[x-2])
-    axs[0].set_xlabel('Number of K')
-    axs[0].set_ylabel('Iterations')
-    axs[0].set_title('Iterations')
+    axs[1].plot(x, wcdList[x-2])
+    axs[1].set_xlabel('Number of K')
+    axs[1].set_ylabel('WCD')
+    axs[1].set_title('WCD')
+
+    
+    axs[2].plot(x, iterList[x-2])
+    axs[2].set_xlabel('Number of K')
+    axs[2].set_ylabel('Iterations')
+    axs[2].set_title('Iterations')
 
     
     fig.tight_layout()
