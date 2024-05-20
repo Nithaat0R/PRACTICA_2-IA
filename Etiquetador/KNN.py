@@ -22,12 +22,12 @@ class KNN:
         #Redimensiona la matriz para que tenga forma (X, 4800)
         self.train_data = train_data.reshape(-1, 4800)
 
-    def get_k_neighbours(self, test_data, k):
+    def get_k_neighbours(self, test_data, k, dist='euclidean'):
 
         #Reordena el tamaño de la matriz de datos por imagenes
         test_data = test_data.reshape(-1,4800)
         #Calcula las distancias entre los datos de la muestra y los datos por defecto
-        distances = cdist(test_data, self.train_data)
+        distances = cdist(test_data, self.train_data, dist)
         self.neighbors = np.array([])
         #Por cada imagen ordena las distancias y guarda las k primeras etiquetas
         for i in distances:
@@ -60,7 +60,7 @@ class KNN:
             ret = np.append(ret, label)
         return ret
 
-    def predict(self, test_data, k):
+    def predict(self, test_data, k, dist='euclidean'):
         #Codigo original del archivo
-        self.get_k_neighbours(test_data, k)
+        self.get_k_neighbours(test_data, k, dist)
         return self.get_class()

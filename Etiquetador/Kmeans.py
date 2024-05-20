@@ -28,7 +28,7 @@ class KMeans:
         if options is None:
             options = {}
         if 'km_init' not in options:
-            options['km_init'] = 'kmeans++'
+            options['km_init'] = 'first'
         if 'verbose' not in options:
             options['verbose'] = False
         if 'tolerance' not in options:
@@ -36,7 +36,7 @@ class KMeans:
         if 'max_iter' not in options:
             options['max_iter'] = 100
         if 'fitting' not in options:
-            options['fitting'] = 20  # within class distance.
+            options['fitting'] = 20 # within class distance.
 
         # If your methods need any other parameter you can add it to the options dictionary
         self.options = options
@@ -180,7 +180,7 @@ class KMeans:
         icd = self.interClassDistance()
         return icd / wcd
 
-    def find_bestK(self, max_K, heuristic):
+    def find_bestK(self, max_K, heuristic='wcd'):
 
         cond = False
         #Calculamos WCD para K = 2

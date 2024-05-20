@@ -166,9 +166,6 @@ def Kmean_statistics(kmeans, kmax):
         
 Kmean_statistics(km, 30)
 
-knn = KNN(utils.rgb2gray(train_imgs), train_class_labels)
-
-
 def Get_shape_accuracy(etiquetesKnn, groundtruth): #Li pasem el groundtruth o el array de labels?
     #Inicialitzem el comptador de coincidències en 100% és a dir en totes.
     comptador = len(etiquetesKnn)
@@ -180,7 +177,8 @@ def Get_shape_accuracy(etiquetesKnn, groundtruth): #Li pasem el groundtruth o el
     #Retornem el calcul del percentatge
     return comptador/len(etiquetesKnn)*100
 
-preds = knn.predict(utils.rgb2gray(test_imgs), 2)
+knn = KNN(utils.rgb2gray(train_imgs), train_class_labels)
+preds = knn.predict(utils.rgb2gray(test_imgs), 5, 'correlation')
 shapeAcc = Get_shape_accuracy(preds, test_class_labels)
 print("Shape accuracy: ", shapeAcc)
 
@@ -221,5 +219,5 @@ def Get_K_accuracy(test_imgs, groundtruth, maxK, heuristic):
     
     return (encerts/len(test_imgs))*100
 
-kAcc = Get_K_accuracy(test_imgs, test_color_labels, 4, 'fisher')
+kAcc = Get_K_accuracy(test_imgs, test_color_labels, 3, 'fisher')
 print("K accuracy: ", kAcc)
